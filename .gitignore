@@ -1,0 +1,19 @@
+# sphinx build directories
+_build/
+# dotfiles
+!.gitignore
+# compiled python files
+*.py[co]
+.DS_Store
+# setup.py egg_info
+*.egg-info
+# emacs backup files
+*~
+# hg stuff
+*.orig
+# vim tmp files
+*.swp
+
+/TODO.md
+/config.sh
+*.bak

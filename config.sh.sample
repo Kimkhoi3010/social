@@ -1,0 +1,8 @@
+# 0: do it for real
+DRY_RUN=0
+# versions to consider
+VERSIONS="13.0 14.0"
+# default version (latest)
+VERSION="14.0"
+# repos to consider
+REPOS="server-tools"
