@@ -162,7 +162,7 @@ try() {
 
     log_and_run pew in $venv odoo \
 	-d ${DB} \
-	--db_host=localhost --db_user=odoo --db_password=odoo \
+	--db_host=localhost --db_user=openerp --db_password=openerp \
 	--workers=0 --max-cron-threads=0 \
 	--limit-time-cpu=3600 \
 	--http-interface=${IP} \
@@ -202,7 +202,7 @@ tests() {
 
     log_and_run pew in $venv odoo \
 	-d ${DB} \
-	--db_host=localhost --db_user=odoo --db_password=odoo \
+	--db_host=localhost --db_user=openerp --db_password=openerp \
 	--workers=0 --max-cron-threads=0 \
 	--limit-time-cpu=3600 \
 	--addons-path=${ADDONS_PATH} \

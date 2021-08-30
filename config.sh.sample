@@ -5,4 +5,6 @@ VERSIONS="13.0 14.0"
 # default version (latest)
 VERSION="14.0"
 # repos to consider
-REPOS="server-tools"
+#REPOS="server-tools"
+# in the dev docker image:
+IP="0.0.0.0"

@@ -67,7 +67,8 @@ Here is how to install and run odoo in one of these venvs:
 
 ```
 pew new venv-odoo14 -p python3
-pip install -e file:///home/nils/code/odoo/odoo/14.0#egg=odoo
+pip install -e file:///opt/openerp/code/odoo/odoo/14.0#egg=odoo
+pip install -r ~/code/odoo/odoo/14.0/requirements.txt
 ```
 
 ## Configuration
