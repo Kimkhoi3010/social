@@ -15,8 +15,10 @@ OCA helpers
 Commands:
 - ./oca.sh pull: pull all repos (VERSIONS: $VERSIONS)
 - ./oca.sh pull REPO: pull given REPO only
-- ./oca.sh deps MODULE: show dependency tree of given MODULE
+- ./oca.sh deps MODULE [VERSION]: show dependency tree of given MODULE
+- ./oca.sh cloc DIR: count lines of code of given module located in DIR, the odoo way
 - ./oca.sh try MODULE [VERSION]: run an odoo instance to try given MODULE (in given VERSION)
+- ./oca.sh shell MODULE [VERSION]: run an odoo shell on the db created for given MODULE (in given VERSION)
 - ./oca.sh tests MODULE [VERSION]: run the tests of a given MODULE (in given VERSION)
 
 EOF
@@ -125,6 +127,11 @@ deps() {
     pew in oca manifestoo --no-addons-path-from-import-odoo --odoo-series "${VERSION}" --addons-path "${ADDONS_PATH}" --select "$module" tree
 }
 
+# count lines of codes, the odoo way
+cloc() {
+    pew in oca cloc-odoo.py $1
+}
+
 try() {
     module=$1
 
@@ -152,6 +159,11 @@ try() {
 	IP="127.0.$major.1"
     fi
 
+    # server_wide_modules
+    if [[ -z "${LOAD}" ]]; then
+	LOAD="web,base"
+    fi
+
     if [[ "${DEBUG}" == "1" ]]; then
 	echo "Running odoo in ${venv}, will be listening on ${IP}:8069"
     fi
@@ -163,6 +175,7 @@ try() {
     log_and_run pew in $venv odoo \
 	-d ${DB} \
 	--db_host=localhost --db_user=openerp --db_password=openerp \
+	--load=${LOAD} \
 	--workers=0 --max-cron-threads=0 \
 	--limit-time-cpu=3600 \
 	--http-interface=${IP} \
@@ -213,6 +226,34 @@ tests() {
 	-u ${module}
 }
 
+shell() {
+    module=$1
+
+    # VERSION
+    if [[ ! -z "$2" ]]; then
+	VERSION="$2"
+    fi
+
+    major=(${VERSION/.0/})
+    venv="venv-odoo$major"
+
+    if [[ "${DEBUG}" == "1" ]]; then
+	echo "Running odoo in ${venv}"
+    fi
+
+    get_addons_path ${VERSION}
+
+    DB="v${major}c_${module}"
+
+    log_and_run pew in $venv odoo \
+		shell \
+		-d ${DB} \
+		--db_host=localhost --db_user=openerp --db_password=openerp \
+		--workers=0 --max-cron-threads=0 \
+		--addons-path=${ADDONS_PATH} \
+		--no-http
+}
+
 ##
 # MAIN
 ##
@@ -223,10 +264,14 @@ elif [[ "$1" == "pull-pr" ]]; then
     pull_pr "$2" "$3"
 elif [[ "$1" == "deps" ]]; then
     deps "$2" "$3"
+elif [[ "$1" == "cloc" ]]; then
+    cloc "$2"
 elif [[ "$1" == "try" ]]; then
     try "$2" "$3"
 elif [[ "$1" == "tests" ]]; then
     tests "$2" "$3"
+elif [[ "$1" == "shell" ]]; then
+    shell "$2" "$3"
 else
     echo "$USAGE"
 fi

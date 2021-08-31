@@ -14,7 +14,10 @@ setup(
         'manifestoo',
         'pre-commit'
     ],
-    scripts=['oca.sh'],
+    scripts=[
+        'oca.sh',
+        'cloc-odoo.py'
+    ],
     classifiers=[
         'Programming Language :: Shell',
         'Intended Audience :: Developers',
