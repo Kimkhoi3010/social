@@ -15,6 +15,7 @@ OCA helpers
 Commands:
 - ./oca.sh pull: pull all repos (VERSIONS: $VERSIONS)
 - ./oca.sh pull REPO: pull given REPO only
+- ./oca.sh pull-pr LINK: pull given PR
 - ./oca.sh deps MODULE [VERSION]: show dependency tree of given MODULE
 - ./oca.sh cloc DIR: count lines of code of given module located in DIR, the odoo way
 - ./oca.sh try MODULE [VERSION]: run an odoo instance to try given MODULE (in given VERSION)
