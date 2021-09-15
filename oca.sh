@@ -13,6 +13,7 @@ read -r -d '' USAGE <<EOF
 OCA helpers
 
 Commands:
+- ./oca.sh find: find MODULE: find MODULE locally or on github
 - ./oca.sh pull: pull all repos (VERSIONS: $VERSIONS)
 - ./oca.sh pull REPO: pull given REPO only
 - ./oca.sh pull-pr LINK: pull given PR
@@ -44,6 +45,17 @@ log_and_run() {
 ##
 # COMMANDS
 ##
+
+# find module
+find_module() {
+    module=$1
+
+    echo "Looking for module locally:"
+    log_and_run find -mindepth 3 -maxdepth 3 -type d -name "${module}"
+
+    echo "Looking also for hints on github:"
+    gh api -X GET search/issues -F per_page=100 --paginate -f q="org:OCA type:pull ${module}" --jq '.items[] | [.number, .state, .title, .html_url] | @tsv'
+}
 
 # pull latest changes from upstream OCA repos
 pull() {
@@ -259,7 +271,9 @@ shell() {
 # MAIN
 ##
 
-if [[ "$1" == "pull" ]]; then
+if [[ "$1" == "find" ]]; then
+    find_module "$2"
+elif [[ "$1" == "pull" ]]; then
     pull "$2"
 elif [[ "$1" == "pull-pr" ]]; then
     pull_pr "$2" "$3"
