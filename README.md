@@ -77,6 +77,18 @@ pip install -r ~/code/odoo/odoo/14.0/requirements.txt
 
 - In your `~/code/oca` folder, create a `config.sh` file, based on the content of `config.sh.sample`
 
+#### Camptocamp projects example
+
+Camptocamp projects are heavily relying on oca modules, with some customizations. We can run them with `oca.sh` with a few changes in the configuration, for example for the cosanum case, assuming that the project code has been cloned in `/opt/openerp/code/camptocamp/cosanum_odoo`:
+
+```
+OCA_ROOT_DIR="/opt/openerp/code/camptocamp/cosanum_odoo/odoo/external-src"
+OCA_ROOT_DIR_MODE="repo_module"
+EXTRA_ADDONS_PATH="/opt/openerp/code/camptocamp/cosanum_odoo/odoo/local-src"
+DB=v14e_cosanum
+VENV=venv-odoo14-cosanum
+```
+
 ### github/travis
 
 - Fork the OCA repos you will be working on in your own github account

@@ -110,9 +110,42 @@ get_addons_path() {
     if [[ ! -z "$1" ]]; then
 	VERSION="$1"
     fi
-    export OCA_ADDONS_PATH=$(find $(pwd) -mindepth 2 -maxdepth 2 -type d -name "${VERSION}" | tr '\n' ',' | head -c-1)
-    export ODOO_ADDONS_PATH=$(dirname $(pwd))/odoo/odoo/${VERSION}/addons
-    export ADDONS_PATH="${ODOO_ADDONS_PATH},${OCA_ADDONS_PATH}"
+
+    # defaults for OCA_ROOT_DIR, ODOO_ROOT_DIR
+    # based on current location
+    if [[ -z "${OCA_ROOT_DIR}" ]]; then
+	export OCA_ROOT_DIR=$(pwd)
+    fi
+    if [[ -z "${ODOO_ROOT_DIR}" ]]; then
+	export ODOO_ROOT_DIR=$(dirname $(pwd))
+    fi
+
+    # OCA_ROOT_DIR_MODE: repo_module
+    # i.e. ${OCA_ROOT_DIR}/server-tools/auditlog
+    if [[ "${OCA_ROOT_DIR_MODE}" == "repo_module" ]]; then
+	DIRS=$(find "${OCA_ROOT_DIR}" -mindepth 1 -maxdepth 1 -type d -not -empty)
+    else
+	# OCA_ROOT_DIR_MODE: repo_version_module (default)
+	# i.e. ${OCA_ROOT_DIR}/server-tools/14.0/auditlog
+	DIRS=$(find "${OCA_ROOT_DIR}" -mindepth 2 -maxdepth 2 -type d -name "${VERSION}" -not -empty)
+    fi
+
+    # filter out folders that don't have at least one module
+    OCA_ADDONS_PATH=""
+    for d in ${DIRS}; do
+	if $(find "$d" -mindepth 1 -maxdepth 1 -type d | grep -v .git >/dev/null); then
+	    export OCA_ADDONS_PATH="${OCA_ADDONS_PATH},$d"
+	else
+	    echo "Ignoring $d: doesn't contain any module"
+	fi
+    done
+
+    export ODOO_ADDONS_PATH="${ODOO_ROOT_DIR}/odoo/odoo/${VERSION}/addons"
+    # note: ${OCA_ADDONS_PATH} starts by , already
+    export ADDONS_PATH="${ODOO_ADDONS_PATH}${OCA_ADDONS_PATH}"
+    if [[ ! -z "${EXTRA_ADDONS_PATH}" ]]; then
+	export ADDONS_PATH="${ADDONS_PATH},${EXTRA_ADDONS_PATH}"
+    fi
 }
 
 # show dependency tree of given module
@@ -165,7 +198,11 @@ try() {
     fi
 
     major=(${VERSION/.0/})
-    venv="venv-odoo$major"
+
+    # you can force a venv in config.sh
+    if [[ -z "${VENV}" ]]; then
+	VENV="venv-odoo$major"
+    fi
 
     # you can force an IP in config.sh
     if [[ -z "${IP}" ]]; then
@@ -178,14 +215,17 @@ try() {
     fi
 
     if [[ "${DEBUG}" == "1" ]]; then
-	echo "Running odoo in ${venv}, will be listening on ${IP}:8069"
+	echo "Running odoo in ${VENV}, will be listening on ${IP}:8069"
     fi
 
     get_addons_path ${VERSION}
 
-    DB="v${major}c_${module}"
+    # you can force a DB in config.sh
+    if [[ -z "${DB}" ]]; then
+	DB="v${major}c_${module}"
+    fi
 
-    log_and_run pew in $venv odoo \
+    log_and_run pew in ${VENV} odoo \
 	-d ${DB} \
 	--db_host=localhost --db_user=openerp --db_password=openerp \
 	--load=${LOAD} \
@@ -216,17 +256,24 @@ tests() {
     fi
 
     major=(${VERSION/.0/})
-    venv="venv-odoo$major"
+
+    # you can force a venv in config.sh
+    if [[ -z "${VENV}" ]]; then
+	VENV="venv-odoo$major"
+    fi
 
     if [[ "${DEBUG}" == "1" ]]; then
-	echo "Running odoo in ${venv}"
+	echo "Running odoo in ${VENV}"
     fi
 
     get_addons_path ${VERSION}
 
-    DB="v${major}c_${module}"
+    # you can force a DB in config.sh
+    if [[ -z "${DB}" ]]; then
+	DB="v${major}c_${module}"
+    fi
 
-    log_and_run pew in $venv odoo \
+    log_and_run pew in ${VENV} odoo \
 	-d ${DB} \
 	--db_host=localhost --db_user=openerp --db_password=openerp \
 	--workers=0 --max-cron-threads=0 \
@@ -248,7 +295,11 @@ shell() {
     fi
 
     major=(${VERSION/.0/})
-    venv="venv-odoo$major"
+
+    # you can force a venv in config.sh
+    if [[ -z "${VENV}" ]]; then
+	VENV="venv-odoo$major"
+    fi
 
     if [[ "${DEBUG}" == "1" ]]; then
 	echo "Running odoo in ${venv}"
@@ -256,9 +307,12 @@ shell() {
 
     get_addons_path ${VERSION}
 
-    DB="v${major}c_${module}"
+    # you can force a DB in config.sh
+    if [[ -z "${DB}" ]]; then
+	DB="v${major}c_${module}"
+    fi
 
-    log_and_run pew in $venv odoo \
+    log_and_run pew in ${VENV} odoo \
 		shell \
 		-d ${DB} \
 		--db_host=localhost --db_user=openerp --db_password=openerp \
