@@ -262,6 +262,11 @@ tests() {
 	VENV="venv-odoo$major"
     fi
 
+    # port
+    if [[ -z "${HTTP_PORT}" ]]; then
+	HTTP_PORT=$((1024+$RANDOM))
+    fi
+
     if [[ "${DEBUG}" == "1" ]]; then
 	echo "Running odoo in ${VENV}"
     fi
@@ -281,7 +286,7 @@ tests() {
 	--addons-path=${ADDONS_PATH} \
 	--test-enable \
 	--http-interface=127.0.0.1 \
-	--http-port=$((1024+$RANDOM)) \
+	--http-port=${HTTP_PORT} \
 	--stop-after-init \
 	-u ${module}
 }
