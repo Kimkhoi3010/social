@@ -104,6 +104,23 @@ pull_pr() {
         git checkout pr-${pr_id}
 }
 
+merge_pr() {
+    # override config.sh VERSION
+    if [[ ! -z "$2" ]]; then
+	VERSION="$2"
+    fi
+
+    # grep -Eo 'https://github.com/OCA/([a-z\-]+)/pull/([0-9]+)'
+    url=$1
+    repo=$(echo $url | cut -f5 -d'/')
+    pr_id=$(echo $url | cut -f7 -d'/')
+
+    git rebase --autosquash -i origin/${VERSION} &&
+    git checkout -b ${VERSION}-ocabot-merge-pr-${pr_id}-by-trobz-bump-nobump origin/${VERSION} &&
+    # Merge PR #${pr_id} into ${VERSION}
+    git merge --no-ff -m "test" pr-${pr_id}
+}
+
 # get addons path for given or default version
 get_addons_path() {
     # override config.sh VERSION
@@ -336,6 +353,9 @@ elif [[ "$1" == "pull" ]]; then
     pull "$2"
 elif [[ "$1" == "pull-pr" ]]; then
     pull_pr "$2" "$3"
+elif [[ "$1" == "merge-pr" ]]; then
+    pull_pr "$2" "$3"
+    merge_pr "$2" "$3"
 elif [[ "$1" == "deps" ]]; then
     deps "$2" "$3"
 elif [[ "$1" == "cloc" ]]; then
