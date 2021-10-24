@@ -248,6 +248,7 @@ try() {
 	--load=${LOAD} \
 	--workers=0 --max-cron-threads=0 \
 	--limit-time-cpu=3600 \
+	--limit-time-real=3600 \
 	--http-interface=${IP} \
 	--addons-path=${ADDONS_PATH} \
 	-i ${module}
@@ -300,6 +301,7 @@ tests() {
 	--db_host=localhost --db_user=openerp --db_password=openerp \
 	--workers=0 --max-cron-threads=0 \
 	--limit-time-cpu=3600 \
+	--limit-time-real=3600 \
 	--addons-path=${ADDONS_PATH} \
 	--test-enable \
 	--http-interface=127.0.0.1 \
