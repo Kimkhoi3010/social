@@ -251,7 +251,8 @@ try() {
 	--limit-time-real=3600 \
 	--http-interface=${IP} \
 	--addons-path=${ADDONS_PATH} \
-	-i ${module}
+	-i ${module} \
+	${EXTRA_PARAMS}
 }
 
 tests() {
@@ -307,7 +308,8 @@ tests() {
 	--http-interface=127.0.0.1 \
 	--http-port=${HTTP_PORT} \
 	--stop-after-init \
-	-u ${module}
+	-u ${module} \
+	${EXTRA_PARAMS}
 }
 
 shell() {
@@ -342,7 +344,8 @@ shell() {
 		--db_host=localhost --db_user=openerp --db_password=openerp \
 		--workers=0 --max-cron-threads=0 \
 		--addons-path=${ADDONS_PATH} \
-		--no-http
+		--no-http \
+		${EXTRA_PARAMS}
 }
 
 ##
