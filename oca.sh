@@ -153,7 +153,7 @@ get_addons_path() {
 	# filter out folders that don't have at least one module
 	OCA_ADDONS_PATH=""
 	for d in ${DIRS}; do
-	    if $(find "$d" -follow -mindepth 1 -maxdepth 1 -type d | grep -v .git >/dev/null); then
+	    if $(find "$d" -follow -mindepth 1 -maxdepth 1 -type d | grep -Ev '(.git|setup)' >/dev/null); then
 		export OCA_ADDONS_PATH="${OCA_ADDONS_PATH},$d"
 	    else
 		echo "Ignoring $d: doesn't contain any module"
