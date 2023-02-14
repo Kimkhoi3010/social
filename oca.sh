@@ -99,7 +99,8 @@ pull_pr() {
 
     echo "${repo}/${VERSION}"
     cd "${repo}/${VERSION}" &&
-        git checkout ${VERSION} &&
+        git branch -D pr-${pr_id} &> /dev/null
+    git checkout ${VERSION} &&
         git fetch origin pull/${pr_id}/head:pr-${pr_id} &&
         git checkout pr-${pr_id}
 }
@@ -137,25 +138,28 @@ get_addons_path() {
 	export ODOO_ROOT_DIR=$(dirname $(pwd))
     fi
 
-    # OCA_ROOT_DIR_MODE: repo_module
-    # i.e. ${OCA_ROOT_DIR}/server-tools/auditlog
-    if [[ "${OCA_ROOT_DIR_MODE}" == "repo_module" ]]; then
-	DIRS=$(find "${OCA_ROOT_DIR}" -follow -mindepth 1 -maxdepth 1 -type d -not -empty)
-    else
-	# OCA_ROOT_DIR_MODE: repo_version_module (default)
-	# i.e. ${OCA_ROOT_DIR}/server-tools/14.0/auditlog
-	DIRS=$(find "${OCA_ROOT_DIR}" -follow -mindepth 2 -maxdepth 2 -type d -name "${VERSION}" -not -empty)
-    fi
+    if [[ "${ODOO_ONLY}" != 1 ]]; then
 
-    # filter out folders that don't have at least one module
-    OCA_ADDONS_PATH=""
-    for d in ${DIRS}; do
-	if $(find "$d" -mindepth 1 -maxdepth 1 -type d | grep -v .git >/dev/null); then
-	    export OCA_ADDONS_PATH="${OCA_ADDONS_PATH},$d"
+	# OCA_ROOT_DIR_MODE: repo_module
+	# i.e. ${OCA_ROOT_DIR}/server-tools/auditlog
+	if [[ "${OCA_ROOT_DIR_MODE}" == "repo_module" ]]; then
+	    DIRS=$(find "${OCA_ROOT_DIR}" -follow -mindepth 1 -maxdepth 1 -type d -not -empty)
 	else
-	    echo "Ignoring $d: doesn't contain any module"
+	    # OCA_ROOT_DIR_MODE: repo_version_module (default)
+	    # i.e. ${OCA_ROOT_DIR}/server-tools/14.0/auditlog
+	    DIRS=$(find "${OCA_ROOT_DIR}" -follow -mindepth 2 -maxdepth 2 -type d -name "${VERSION}" -not -empty)
 	fi
-    done
+
+	# filter out folders that don't have at least one module
+	OCA_ADDONS_PATH=""
+	for d in ${DIRS}; do
+	    if $(find "$d" -follow -mindepth 1 -maxdepth 1 -type d | grep -Ev '(.git|setup)' >/dev/null); then
+		export OCA_ADDONS_PATH="${OCA_ADDONS_PATH},$d"
+	    else
+		echo "Ignoring $d: doesn't contain any module"
+	    fi
+	done
+    fi
 
     export ODOO_ADDONS_PATH="${ODOO_ROOT_DIR}/odoo/odoo/${VERSION}/addons"
     # note: ${OCA_ADDONS_PATH} starts by , already
@@ -242,6 +246,11 @@ try() {
 	DB="v${major}c_${module}"
     fi
 
+    # we install module by default
+    if [[ "${INSTALL}" != 0 ]]; then
+	INSTALL_MODULE="-i ${module}"
+    fi
+
     log_and_run pew in ${VENV} odoo \
 	-d ${DB} \
 	--db_host=localhost --db_user=openerp --db_password=openerp \
@@ -251,7 +260,7 @@ try() {
 	--limit-time-real=3600 \
 	--http-interface=${IP} \
 	--addons-path=${ADDONS_PATH} \
-	-i ${module} \
+	${INSTALL_MODULE} \
 	${EXTRA_PARAMS}
 }
 
