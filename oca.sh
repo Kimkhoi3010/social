@@ -99,7 +99,8 @@ pull_pr() {
 
     echo "${repo}/${VERSION}"
     cd "${repo}/${VERSION}" &&
-        git checkout ${VERSION} &&
+        git branch -D pr-${pr_id} &> /dev/null
+    git checkout ${VERSION} &&
         git fetch origin pull/${pr_id}/head:pr-${pr_id} &&
         git checkout pr-${pr_id}
 }
