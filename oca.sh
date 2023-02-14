@@ -140,11 +140,11 @@ get_addons_path() {
     # OCA_ROOT_DIR_MODE: repo_module
     # i.e. ${OCA_ROOT_DIR}/server-tools/auditlog
     if [[ "${OCA_ROOT_DIR_MODE}" == "repo_module" ]]; then
-	DIRS=$(find "${OCA_ROOT_DIR}" -mindepth 1 -maxdepth 1 -type d -not -empty)
+	DIRS=$(find "${OCA_ROOT_DIR}" -follow -mindepth 1 -maxdepth 1 -type d -not -empty)
     else
 	# OCA_ROOT_DIR_MODE: repo_version_module (default)
 	# i.e. ${OCA_ROOT_DIR}/server-tools/14.0/auditlog
-	DIRS=$(find "${OCA_ROOT_DIR}" -mindepth 2 -maxdepth 2 -type d -name "${VERSION}" -not -empty)
+	DIRS=$(find "${OCA_ROOT_DIR}" -follow -mindepth 2 -maxdepth 2 -type d -name "${VERSION}" -not -empty)
     fi
 
     # filter out folders that don't have at least one module
