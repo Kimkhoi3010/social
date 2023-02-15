@@ -128,3 +128,9 @@ Better run the `try` command before running tests, so that the db would be creat
 
 	oca.sh pull-pr https://github.com/OCA/credit-control/pull/146 14.0
 	oca.sh try account_invoice_overdue_reminder 14.0
+
+### Custom Odoo's options
+
+Use `EXTRA_PARAMS` env to put another odoo's options, for example: db port
+
+    EXTRA_PARAMS="--db_port 3xxx" oca.sh [commands]
