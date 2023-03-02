@@ -10,6 +10,7 @@ This repo contains:
 
 - Working in the dev docker image OR in a Ubuntu
 - PG must be running
+- [Github Cli](https://cli.github.com) is used for the `oca.sh find` command
 
 ## Installation
 
@@ -134,3 +135,11 @@ Better run the `try` command before running tests, so that the db would be creat
 Use `EXTRA_PARAMS` env to put another odoo's options, for example: db port
 
     EXTRA_PARAMS="--db_port 3xxx" oca.sh [commands]
+
+### Run Odoo native only (no OCA module)
+
+	ODOO_ONLY=1 oca.sh try website_sale
+
+Or with Enterprise modules:
+
+	ODOO_ONLY=1 EXTRA_ADDONS_PATH=$(realpath ~/code/odoo/enterprise/16.0) DB="v16e_website_sale" oca.sh try website_sale
