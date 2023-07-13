@@ -251,7 +251,7 @@ try() {
 	INSTALL_MODULE="-i ${module}"
     fi
 
-    log_and_run pew in ${VENV} odoo \
+    log_and_run pew in ${VENV} ${ODOO_COMMAND:-odoo} \
 	-d ${DB} \
 	--db_host=localhost --db_user=openerp --db_password=openerp \
 	--load=${LOAD} \
@@ -306,7 +306,7 @@ tests() {
 	DB="v${major}c_${module}"
     fi
 
-    log_and_run pew in ${VENV} odoo \
+    log_and_run pew in ${VENV} ${ODOO_COMMAND:-odoo} \
 	-d ${DB} \
 	--db_host=localhost --db_user=openerp --db_password=openerp \
 	--workers=0 --max-cron-threads=0 \
