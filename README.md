@@ -67,3 +67,13 @@ Better run the `try` command before running tests, so that the db would be creat
 
 	oca.sh pull-pr https://github.com/OCA/credit-control/pull/146 14.0
 	odoo.sh try account_invoice_overdue_reminder 14.0
+
+### Migrate a module with oca-port
+
+	cd ~/code/oca
+	oca.sh pull server-tools
+	cd server-tools/17.0
+	git remote add nils git@github.com:nilshamerlinck/server-tools.git
+	pew in oca oca-port --repo-name server-tools 16.0 17.0 dbfilter_from_header --verbose --fork nils
+
+And follow instructions!
